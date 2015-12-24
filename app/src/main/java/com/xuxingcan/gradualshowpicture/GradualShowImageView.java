@@ -1,12 +1,12 @@
 package com.xuxingcan.gradualshowpicture;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.drawable.ClipDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.animation.LinearInterpolator;
@@ -21,6 +21,7 @@ public class GradualShowImageView extends ImageView {
     private int length;
     public static final int SLIP_TOP = 1, SLIP_BOTTOM = 2, SLIP_LEFT = 3, SLIP_RIGHT = 4;
     private ValueAnimator.AnimatorUpdateListener mListener;
+    private Drawable mDrawable;
 
     public GradualShowImageView(Context context) {
         this(context, null);
@@ -32,6 +33,7 @@ public class GradualShowImageView extends ImageView {
 
     public GradualShowImageView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        mDrawable = getDrawable();
     }
 
     public void startGradualShowAnimator(int slip, int mDuration) {
@@ -39,13 +41,13 @@ public class GradualShowImageView extends ImageView {
     }
 
     public void startGradualShowAnimator(int slip, int mDuration, TimeInterpolator mTimeInterpolator, Animator.AnimatorListener mAnimatorListener) {
-        if (getDrawable() != null) {
+        if (mDrawable != null) {
             mClipDrawable = null;
             animator = null;
             mListener = null;
             switch (slip) {
                 case SLIP_BOTTOM:
-                    mClipDrawable = new ClipDrawable(getDrawable(), Gravity.BOTTOM, ClipDrawable.VERTICAL);
+                    mClipDrawable = new ClipDrawable(mDrawable, Gravity.BOTTOM, ClipDrawable.VERTICAL);
                     length = getHeight();
                     animator = ObjectAnimator.ofFloat(this, "writeSomeNoPointWordsSuchAsILoveRuby", 0F, length);
                     mListener = new ValueAnimator.AnimatorUpdateListener() {
@@ -59,7 +61,7 @@ public class GradualShowImageView extends ImageView {
                     };
                     break;
                 case SLIP_LEFT:
-                    mClipDrawable = new ClipDrawable(getDrawable(), Gravity.START, ClipDrawable.HORIZONTAL);
+                    mClipDrawable = new ClipDrawable(mDrawable, Gravity.START, ClipDrawable.HORIZONTAL);
                     length = -getWidth();
                     animator = ObjectAnimator.ofFloat(this, "writeSomeNoPointWordsSuchAsILoveRuby", 0F, length);
                     mListener = new ValueAnimator.AnimatorUpdateListener() {
@@ -73,7 +75,7 @@ public class GradualShowImageView extends ImageView {
                     };
                     break;
                 case SLIP_RIGHT:
-                    mClipDrawable = new ClipDrawable(getDrawable(), Gravity.END, ClipDrawable.HORIZONTAL);
+                    mClipDrawable = new ClipDrawable(mDrawable, Gravity.END, ClipDrawable.HORIZONTAL);
                     length = getWidth();
                     animator = ObjectAnimator.ofFloat(this, "writeSomeNoPointWordsSuchAsILoveRuby", 0F, length);
                     mListener = new ValueAnimator.AnimatorUpdateListener() {
@@ -87,7 +89,7 @@ public class GradualShowImageView extends ImageView {
                     };
                     break;
                 case SLIP_TOP:
-                    mClipDrawable = new ClipDrawable(getDrawable(), Gravity.TOP, ClipDrawable.VERTICAL);
+                    mClipDrawable = new ClipDrawable(mDrawable, Gravity.TOP, ClipDrawable.VERTICAL);
                     length = -getHeight();
                     animator = ObjectAnimator.ofFloat(this, "writeSomeNoPointWordsSuchAsILoveRuby", 0F, length);
                     mListener = new ValueAnimator.AnimatorUpdateListener() {
@@ -103,27 +105,17 @@ public class GradualShowImageView extends ImageView {
                 default:
                     return;
             }
+            setTranslationY(0);
+            setTranslationX(0);
             mClipDrawable.setLevel(0);
             setImageDrawable(mClipDrawable);
             animator.addUpdateListener(mListener);
             animator.setDuration(mDuration);
             animator.setInterpolator(mTimeInterpolator);
-            if(mAnimatorListener!=null){
+            if (mAnimatorListener != null) {
                 animator.addListener(mAnimatorListener);
             }
             animator.start();
-
-
-//            AnimatorSet animSet = new AnimatorSet();
-//            animSet.play(animator);
-//            animSet.setDuration(mDuration);
-//            animSet.setInterpolator(mTimeInterpolator);
-////            animSet.setDuration(5000);
-////            animSet.setInterpolator(new LinearInterpolator());
-//            if (mAnimatorListener != null) {
-//                animSet.addListener(mAnimatorListener);
-//            }
-//            animSet.start();
         }
     }
 }
